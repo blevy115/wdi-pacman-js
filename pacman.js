@@ -1,7 +1,7 @@
 // Setup initial game stats
 var score = 0;
 var lives = 2;
-
+var powerPellets = 4;
 
 // Define your ghosts here
 var inky = {
@@ -36,6 +36,7 @@ var clyde = {
   edible: false
 };
 
+var ghosts = [inky, blinky, pinky, clyde]
 
 // Draw the screen functionality
 function drawScreen() {
@@ -52,13 +53,21 @@ function clearScreen() {
 }
 
 function displayStats() {
-  console.log('Score: ' + score + '     Lives: ' + lives);
+  console.log('Score: ' + score + '     Lives: ' + lives +'\n\n\nPower Pellets: '+powerPellets);
+
+
 }
 
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
   console.log('(d) Eat Dot');
+  console.log('(p) Eat Power-Pellet');
+  console.log('(1) Eat Inky ('+edible(inky)+')');
+  console.log('(2) Eat Blinky ('+edible(blinky)+')');
+  console.log('(3) Eat Pinky ('+edible(pinky)+')');
+  console.log('(4) Eat Clyde ('+edible(clyde)+')');
   console.log('(q) Quit');
+
 }
 
 function displayPrompt() {
@@ -73,7 +82,46 @@ function eatDot() {
   score += 10;
 }
 
+function edible(ghost){
+  if (ghost['edible']===true){
+    return 'edible';
+  }else {
+    return 'inedible';
+  }
+}
 
+function eatGhost(ghost){
+  if (ghost['edible']===false){
+    lives --;
+    console.log('Pacman was killed by ghost '+ghost['name']);
+  }else if (ghost['edible']===true){
+    console.log('Ghost '+ghost['name']+' was eaten');
+    score += 200
+    ghost['edible'] = false
+  }
+}
+
+function eatPowerPellet(){
+  score += 50;
+  ghosts.forEach(function(ghost){
+    ghost['edible']= true
+  });
+  powerPellets --
+}
+
+function checkPowerPellets(){
+  if (powerPellets > 0){
+    return true
+  } else{
+    return false
+  }
+}
+
+function checkLives(){
+  if(lives <= 0){
+    process.exit();
+  }
+}
 // Process Player's Input
 function processInput(key) {
   switch(key) {
@@ -84,9 +132,29 @@ function processInput(key) {
     case 'd':
       eatDot();
       break;
+    case 'p':
+      if (checkPowerPellets() == true){
+      eatPowerPellet();
+    }else {
+      console.log('\n No more Power Pellets');
+    }
+      break;
+    case '1':
+      eatGhost(ghosts[0]);
+      break;
+    case '2':
+      eatGhost(ghosts[1]);
+      break;
+    case '3':
+      eatGhost(ghosts[2]);
+      break;
+    case '4':
+      eatGhost(ghosts[3]);
+      break;
     default:
       console.log('\nInvalid Command!');
   }
+  checkLives()
 }
 
 
